@@ -1,4 +1,4 @@
-# NETSOL RAG System
+# RAG-Netsolcompany
 
 Source-grounded Retrieval-Augmented Generation project for querying the NETSOL company corpus.
 
