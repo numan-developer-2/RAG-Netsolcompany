@@ -1,0 +1,28 @@
+# Secrets
+.env
+frontend/.env.local
+
+# Local editor/agent state
+.vscode/
+.agents/
+
+# Python caches and runtime logs
+__pycache__/
+*.py[cod]
+*.log
+*.err
+query_logs.jsonl
+llm_errors.jsonl
+
+# Frontend dependencies and build output
+frontend/node_modules/
+frontend/.next/
+frontend/tsconfig.tsbuildinfo
+
+# Local QA screenshots
+frontend_*.png
+
+# Large generated RAG artifacts kept locally
+chroma_db/
+bm25_index.pkl
+netsol_scraped_data/
