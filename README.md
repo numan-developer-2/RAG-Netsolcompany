@@ -93,11 +93,16 @@ Important files:
 - `BACKEND_README.md` - backend-specific details
 - `RUNBOOK.md` - local run and verification commands
 
-Included project reference files:
+## Project Documents
 
-- `Netsol_RAG_Backend_MasterPrompt.pdf`
-- `Netsol_RAG_Backend_MasterPrompt.extracted.txt`
-- `Netsol_RAG_MasterDoc.docx`
+These files are included in the GitHub repository and can be opened directly from the root file list:
+
+- [`BACKEND_COMPLETION_AUDIT.md`](BACKEND_COMPLETION_AUDIT.md) - backend completion and verification audit
+- [`BACKEND_README.md`](BACKEND_README.md) - backend setup, API, and run details
+- [`RUNBOOK.md`](RUNBOOK.md) - service startup and health-check commands
+- [`Netsol_RAG_Backend_MasterPrompt.pdf`](Netsol_RAG_Backend_MasterPrompt.pdf) - original backend master prompt
+- [`Netsol_RAG_Backend_MasterPrompt.extracted.txt`](Netsol_RAG_Backend_MasterPrompt.extracted.txt) - extracted text from the backend master prompt
+- [`Netsol_RAG_MasterDoc.docx`](Netsol_RAG_MasterDoc.docx) - original RAG master document
 
 These reference documents are small and kept in the repository because they describe the original backend/RAG requirements.
 
