@@ -214,29 +214,6 @@ The Next.js frontend provides a clean RAG workspace:
     └── tsconfig.json
 ```
 
-## Local-Only Files Not Uploaded
-
-These files are intentionally ignored:
-
-```text
-.env
-.vscode/
-.agents/
-BACKEND_COMPLETION_AUDIT.md
-BACKEND_README.md
-Netsol_RAG_Backend_MasterPrompt.extracted.txt
-Netsol_RAG_Backend_MasterPrompt.pdf
-Netsol_RAG_MasterDoc.docx
-chroma_db/
-bm25_index.pkl
-netsol_scraped_data/
-frontend/node_modules/
-frontend/.next/
-frontend/tsconfig.tsbuildinfo
-query_logs.jsonl
-llm_errors.jsonl
-```
-
 Why:
 
 - `.env` contains private API keys.
