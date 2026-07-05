@@ -14,6 +14,38 @@ This folder contains the working NETSOL RAG backend.
 
 Gemini embeddings were not used for final ingestion because the API quota was exhausted. Local embeddings keep Step 1 complete and repeatable.
 
+## Local Data Artifacts
+
+The backend expects these generated artifacts to exist locally:
+
+```text
+chroma_db/
+bm25_index.pkl
+netsol_scraped_data/
+```
+
+They are intentionally ignored by Git because they are large generated files:
+
+- `netsol_scraped_data/`: about `1.64 GB`
+- `chroma_db/`: about `956 MB`
+- `bm25_index.pkl`: about `218 MB`
+
+If these files are missing on a fresh clone, restore them from the local data backup or rerun `ingest.py` after placing the scraped JSONL files in `netsol_scraped_data/`.
+
+## Answer Quality Controls
+
+The backend is tuned for short company-focused answers. These settings live in `.env` / `config.py`:
+
+```text
+SIMPLE_CONTEXT_CHUNKS=3
+COMPLEX_CONTEXT_CHUNKS=5
+CONTEXT_CHARS_PER_CHUNK=900
+ANSWER_MAX_WORDS=90
+GENERATION_MAX_TOKENS=384
+```
+
+`nodes.py` also applies backend-side cleanup so simple company questions do not return long paragraphs or irrelevant old technical details.
+
 ## Run Backend
 
 Recommended:
