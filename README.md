@@ -1,54 +1,105 @@
 # RAG-Netsolcompany
 
-Professional Retrieval-Augmented Generation (RAG) system for querying a NETSOL Technologies company knowledge base. The project includes a FastAPI/LangGraph backend, ChromaDB + BM25 retrieval, Gemini/OpenRouter LLM generation, and a modern Next.js frontend.
+An end-to-end Retrieval-Augmented Generation (RAG) system built for querying a NETSOL Technologies knowledge base with grounded, concise, source-backed answers.
 
-## Project Goal
+This project demonstrates a complete RAG workflow: large-scale web/PDF corpus preparation, hybrid retrieval, vector indexing, keyword search, LangGraph orchestration, LLM answer generation, validation, API serving, and a modern frontend experience.
 
-This system answers company-related questions from a scraped NETSOL corpus using source-grounded retrieval. It is designed for short, factual answers with citations instead of long generic LLM responses.
+It is structured as a portfolio-ready, production-style implementation: modular backend code, clear startup scripts, safe repository hygiene, documented operational checks, and a client-facing interface.
+
+## Why This Project Matters
+
+Most basic chatbot demos send a user question directly to an LLM. This project solves a more realistic business problem: answering company-specific questions from a private or scraped knowledge base while keeping responses accurate, concise, and traceable to sources.
+
+The system is designed for:
+
+- company knowledge assistants
+- investor-relations document search
+- product documentation Q&A
+- sales/research enablement
+- internal enterprise search
+- source-grounded executive summaries
+
+## What This RAG System Can Do
 
 Example questions:
 
 - What is LeasePak?
 - What does NETSOL do?
-- Summarize NETSOL financial performance from available reports.
-- Compare LeasePak and NFS Ascent using the indexed corpus.
+- Which products are mentioned in the NETSOL corpus?
+- Summarize available financial information from reports.
+- Compare LeasePak and NFS Ascent using retrieved evidence.
+- Answer from PDF filings and web pages with citations.
 
-## Current Dataset Status
+The backend is optimized to avoid generic, overly long LLM responses. Simple company questions return short factual answers with citations, while complex questions can use more context.
 
-The local dataset and generated indexes are intentionally not committed to GitHub because they are large generated artifacts.
+## Key Features
 
-| Artifact | Local path | Status | Size |
-| --- | --- | --- | --- |
-| Scraped NETSOL data | `netsol_scraped_data/` | Local only | ~1.64 GB |
-| Scraped files | `netsol_scraped_data/` | Local only | 13,665 files |
-| Main RAG chunks | `netsol_scraped_data/rag_chunks.jsonl` | Local only | ~131 MB |
-| Page corpus records | `netsol_scraped_data/rag_corpus.jsonl` | Local only | ~109 MB |
-| PDF chunks | `netsol_scraped_data/rag_pdf_chunks.jsonl` | Local only | ~24.6 MB |
-| Chroma vector DB | `chroma_db/` | Local only | ~956 MB |
-| BM25 keyword index | `bm25_index.pkl` | Local only | ~218 MB |
+| Area | Implementation |
+| --- | --- |
+| Data ingestion | JSONL corpus loading, chunk filtering, metadata preservation |
+| Vector search | ChromaDB persistent collections |
+| Keyword search | BM25 lexical retrieval |
+| Hybrid retrieval | Vector + BM25 result fusion |
+| PDF support | Separate PDF chunks and source/page citations |
+| Orchestration | LangGraph node-based RAG pipeline |
+| LLM generation | Gemini via OpenRouter |
+| Embeddings | Local Sentence Transformers embeddings |
+| Validation | Hallucination guard and confidence metadata |
+| API | FastAPI endpoints plus SSE streaming |
+| Frontend | Next.js interface with responsive RAG workspace |
+| Repository hygiene | Secrets, vector DB, scraped data, and build artifacts excluded from GitHub |
+
+## RAG Pipeline
+
+```text
+User question
+  -> FastAPI /query or /query/stream
+  -> LangGraph state pipeline
+  -> Query analysis
+  -> Query rewriting
+  -> Hybrid retrieval
+      - ChromaDB semantic search
+      - BM25 keyword search
+  -> Multi-hop expansion when needed
+  -> Reranking / top evidence selection
+  -> Context compression
+  -> Gemini answer generation
+  -> Hallucination guard
+  -> Final response formatting
+  -> Frontend answer with sources and confidence
+```
+
+## LangGraph Nodes
+
+The backend pipeline is organized into clear RAG stages:
+
+- Query analyzer: detects intent, complexity, route, PDF priority, and query variants.
+- Hybrid retriever: combines semantic vector search with BM25 search.
+- Multi-hop retriever: expands complex questions using extracted entities.
+- Reranker: selects the most relevant evidence passages.
+- Generator: sends compressed source context to the LLM.
+- Hallucination guard: validates answer support against retrieved context.
+- Response formatter: returns concise final output with metadata.
+
+## Dataset and Index Status
+
+The project was built around a large NETSOL scraped corpus. The generated data/index files are intentionally kept local because they are too large for normal GitHub storage.
+
+| Artifact | Local path | Size / Count |
+| --- | --- | --- |
+| Scraped NETSOL data | `netsol_scraped_data/` | ~1.64 GB |
+| Scraped files | `netsol_scraped_data/` | 13,665 files |
+| Main RAG chunks | `netsol_scraped_data/rag_chunks.jsonl` | ~131 MB |
+| Page corpus records | `netsol_scraped_data/rag_corpus.jsonl` | ~109 MB |
+| PDF chunks | `netsol_scraped_data/rag_pdf_chunks.jsonl` | ~24.6 MB |
+| ChromaDB vector index | `chroma_db/` | ~956 MB |
+| BM25 index | `bm25_index.pkl` | ~218 MB |
 
 Indexed collection counts:
 
 - Web chunks: `25,029`
 - PDF chunks: `10,651`
 - Metadata records: `6,315`
-
-These artifacts are ignored through `.gitignore` so the repository remains lightweight and safe to clone.
-
-## Architecture
-
-```text
-User question
-  -> Next.js frontend
-  -> FastAPI API
-  -> LangGraph RAG pipeline
-  -> Query analysis
-  -> Hybrid retrieval: ChromaDB vector search + BM25 keyword search
-  -> Reranking / top evidence selection
-  -> Gemini/OpenRouter answer generation
-  -> Hallucination guard
-  -> Concise sourced response
-```
 
 ## Tech Stack
 
@@ -59,8 +110,9 @@ Backend:
 - LangGraph
 - ChromaDB
 - BM25 (`rank-bm25`)
-- Sentence Transformers local embeddings
+- Sentence Transformers
 - Gemini through OpenRouter
+- Server-Sent Events streaming
 
 Frontend:
 
@@ -68,37 +120,103 @@ Frontend:
 - React
 - TypeScript
 - Framer Motion
-- Lucide icons
+- Lucide React icons
 
-Retrieval/LLM configuration:
+Models and retrieval:
 
-- Embeddings: `sentence-transformers/all-MiniLM-L6-v2`
+- Embedding model: `sentence-transformers/all-MiniLM-L6-v2`
 - LLM provider: OpenRouter
 - LLM model: `google/gemini-2.5-flash`
-- Vector DB: ChromaDB
-- Keyword search: BM25
+- Vector database: ChromaDB
+- Keyword retrieval: BM25
 
-## Repository Contents
+## Answer Quality Engineering
 
-Important files:
+The system includes practical controls to make LLM answers useful in a business setting:
 
-- `api.py` - FastAPI server and streaming endpoints
-- `graph.py` - LangGraph wiring
-- `nodes.py` - query analysis, retrieval, generation, validation, formatting
-- `ingest.py` - ingestion pipeline for ChromaDB and BM25
-- `config.py` - central backend settings
-- `state.py` - LangGraph state schema
-- `frontend/` - Next.js RAG interface
-- `scripts/` - startup scripts for backend/frontend
-- `RUNBOOK.md` - local run and verification commands
+- concise answer prompt
+- query-relevant context compression
+- small context window for simple questions
+- larger context window for analytical questions
+- low generation token budget
+- backend answer length guard
+- source citation enforcement
+- hallucination guard
+- confidence scoring
+- route and intent metadata
+- removal of unrequested legacy technical details for simple company answers
 
-## Project Documents
+Important config values:
 
-The public repository keeps the runnable code, setup files, and runbook. Internal audit files and original prompt/master documents are kept locally only and are ignored by Git.
+```text
+SIMPLE_CONTEXT_CHUNKS=3
+COMPLEX_CONTEXT_CHUNKS=5
+CONTEXT_CHARS_PER_CHUNK=900
+ANSWER_MAX_WORDS=90
+GENERATION_MAX_TOKENS=384
+```
 
-## Files Not Uploaded
+## API Endpoints
 
-The following are intentionally not committed:
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| GET | `/health` | Backend and index health |
+| GET | `/stats` | Collection/artifact statistics |
+| POST | `/query` | Standard RAG query |
+| POST | `/query/stream` | Streaming RAG response |
+| GET | `/sources/{chunk_id}` | Inspect source chunk text/metadata |
+
+Example query:
+
+```powershell
+$body = @{
+  query = "What is LeasePak?"
+  persona = "general"
+  chat_history = @()
+} | ConvertTo-Json
+
+Invoke-RestMethod http://127.0.0.1:8000/query -Method Post -ContentType "application/json" -Body $body
+```
+
+## Frontend Experience
+
+The Next.js frontend provides a clean RAG workspace:
+
+- persona selector
+- suggested prompts
+- health/status panel
+- streaming answer state
+- citations and sources
+- confidence/verification metadata
+- responsive desktop/mobile layout
+- professional light UI with smooth transitions
+
+## Repository Structure
+
+```text
+.
+├── api.py
+├── config.py
+├── graph.py
+├── ingest.py
+├── nodes.py
+├── state.py
+├── smoke_test_backend.py
+├── requirements.txt
+├── RUNBOOK.md
+├── scripts/
+│   ├── start_backend.ps1
+│   ├── start_frontend.ps1
+│   └── start_all.ps1
+└── frontend/
+    ├── app/
+    ├── package.json
+    └── tsconfig.json
+```
+
+## Local-Only Files Not Uploaded
+
+These files are intentionally ignored:
 
 ```text
 .env
@@ -119,35 +237,35 @@ query_logs.jsonl
 llm_errors.jsonl
 ```
 
-Reasons:
+Why:
 
-- `.env` contains API keys and must never be pushed.
+- `.env` contains private API keys.
 - `chroma_db/`, `bm25_index.pkl`, and `netsol_scraped_data/` are large generated artifacts.
-- `node_modules/` and `.next/` are reproducible build/dependency folders.
-- logs and cache files are runtime-only.
+- `frontend/node_modules/` and `frontend/.next/` are reproducible.
+- internal prompt/audit documents are kept local only.
 
 ## Setup
 
-1. Install backend dependencies:
+Install backend dependencies:
 
 ```powershell
 pip install -r requirements.txt
 ```
 
-2. Create environment file:
+Create environment file:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-3. Add required keys in `.env`:
+Add API keys:
 
 ```text
 GOOGLE_API_KEY=your_gemini_api_key_here
 OPENROUTER_API_KEY=your_openrouter_api_key_here
 ```
 
-4. Install frontend dependencies:
+Install frontend dependencies:
 
 ```powershell
 cd frontend
@@ -156,7 +274,7 @@ npm install
 
 ## Run Locally
 
-Start backend from the project root:
+Start backend:
 
 ```powershell
 .\scripts\start_backend.ps1
@@ -169,7 +287,7 @@ cd frontend
 npm run dev
 ```
 
-Open:
+Open the app:
 
 ```text
 http://127.0.0.1:3000
@@ -187,36 +305,15 @@ Frontend proxy health:
 Invoke-RestMethod http://127.0.0.1:3000/api/rag/health
 ```
 
-## Backend Notes
-
-On this Windows machine, the correct backend Python is usually:
-
-```text
-%LOCALAPPDATA%\Programs\Python\Python312\python.exe
-```
-
-Use `.\scripts\start_backend.ps1` instead of plain `python -m uvicorn ...` because another Python installation may not have `langgraph` and other RAG dependencies installed.
-
-## Answer Quality Improvements
-
-The generation pipeline is tuned for concise company answers:
-
-- small context window for simple questions
-- query-relevant sentence extraction before generation
-- lower generation token budget
-- backend answer length guard
-- inline source citation enforcement
-- unrequested technical/platform details removed from simple company answers
-
-This prevents Gemini from producing long paragraphs when the user needs a short factual answer.
-
 ## Verification
 
-Useful checks:
+Backend compile check:
 
 ```powershell
-python -m py_compile api.py config.py graph.py ingest.py nodes.py smoke_test_backend.py state.py
+& "$env:LOCALAPPDATA\Programs\Python\Python312\python.exe" -m py_compile api.py config.py graph.py ingest.py nodes.py smoke_test_backend.py state.py
 ```
+
+Frontend checks:
 
 ```powershell
 cd frontend
@@ -230,12 +327,21 @@ Backend smoke test:
 & "$env:LOCALAPPDATA\Programs\Python\Python312\python.exe" smoke_test_backend.py
 ```
 
-## GitHub Hygiene
+## Engineering Highlights
 
-Before pushing, confirm ignored files are not staged:
+This project demonstrates:
 
-```powershell
-git status --short --ignored
-```
+- practical RAG backend architecture
+- LangGraph orchestration
+- hybrid semantic + lexical retrieval
+- source-grounded generation
+- local embedding fallback when API quota is limited
+- clean API boundaries
+- SSE response streaming
+- RAG answer quality tuning
+- frontend integration through a proxy route
+- repository safety for secrets and large generated artifacts
 
-Expected ignored local artifacts include `.env`, `chroma_db/`, `bm25_index.pkl`, `netsol_scraped_data/`, `frontend/node_modules/`, and `frontend/.next/`.
+## Notes for Reviewers
+
+The codebase is complete and runnable when the local data/index artifacts are available. The public GitHub repository intentionally contains only source code, setup files, frontend code, and operational docs. Large generated indexes and private API keys are excluded for security and repository hygiene.
