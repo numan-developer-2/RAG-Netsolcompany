@@ -33,3 +33,6 @@ Netsol_RAG_MasterDoc.docx
 chroma_db/
 bm25_index.pkl
 netsol_scraped_data/
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
